@@ -1,5 +1,4 @@
-ARG IMAGE=intersystemsdc/iris-ml-community:2021.2.0.617.0-zpm
-ARG IMAGE=intersystemsdc/iris-ml-community
+ARG IMAGE=containers.intersystems.com/intersystems/iris-community:latest-em
 FROM $IMAGE
 
 USER root
@@ -17,3 +16,9 @@ COPY iris.script /tmp/iris.script
 RUN iris start IRIS \
 	&& iris session IRIS < /tmp/iris.script \
     && iris stop IRIS quietly
+
+ENV PIP_DEFAULT_TIMEOUT=60 \
+    PIP_RETRIES=10 \
+    PIP_TRUSTED_HOST=registry.intersystems.com
+
+RUN python3 -m pip install --no-cache-dir --index-url https://registry.intersystems.com/pypi/simple --target /usr/irissys/mgr/python intersystems-iris-automl
